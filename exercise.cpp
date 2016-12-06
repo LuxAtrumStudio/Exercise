@@ -51,7 +51,7 @@ void exercise::DisplayExercise() {
     std::cout << "NO EXERCISES FOR TODAY\n";
     induco::SetColor(7);
   }
-  for (int i = 0; i < goals.size(); i++) {
+  for (int i = 0; i < goals.size() && i < height - 7; i++) {
     CheckGoal(i);
     std::string line = "";
     line = line + GetActivity(goals[i].activity) + " " +
@@ -83,7 +83,7 @@ void exercise::DisplayExercise() {
     std::cout << "NO EXERCISES RECORDED\n";
     induco::SetColor(7);
   }
-  for (int i = 0; i < workouts.size(); i++) {
+  for (int i = 0; i < workouts.size() && i < height - 7 - goals.size(); i++) {
     std::string line = "";
     line = induco::DisplayDate(workouts[i].date, false, false);
     while (line.size() < groupsize) {
