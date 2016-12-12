@@ -17,6 +17,7 @@ pessum::luxreader::DataFile workoutlux;
 void exercise::MainLoop() {
   bool running = true;
   LoadExerciseData();
+  GoalBackUp();
   std::string input = "";
   while (running == true) {
     DisplayExercise();
@@ -192,25 +193,63 @@ void exercise::EditWorkOut(int pointer) {}
 
 bool exercise::CheckGoal(int pointer) {
   time_t currenttime;
-  struct tm *current;
-  struct tm *workout;
+  struct tm current;
+  struct tm workout;
   time(&currenttime);
-  current = gmtime(&currenttime);
-  int day = current->tm_yday;
+  current = *localtime(&currenttime);
   for (int i = 0; i < workouts.size(); i++) {
-    workout = gmtime(&workouts[i].date);
-    int workoutday = workout->tm_yday;
-    if (day == workoutday) {
+    workout = *localtime(&workouts[i].date);
+    if (workout.tm_yday == current.tm_yday) {
       if (workouts[i].activity == goals[pointer].activity &&
           workouts[i].count == goals[pointer].count) {
         goals[pointer].compleated = true;
         return (true);
       }
     }
-    if (workout->tm_yday < current->tm_yday) {
+    if (workout.tm_yday < current.tm_yday) {
       return (false);
     }
   }
 }
 
 bool exercise::SortCheck(WorkOut a, WorkOut b) { return (a.date > b.date); }
+
+void exercise::GoalBackUp() {
+  time_t currenttime;
+  time(&currenttime);
+  struct tm currenttm = *localtime(&currenttime);
+  struct tm workouttm = *localtime(&workouts[0].date);
+  std::vector<int> goalcounters;
+  int multiplier = 5;
+  if (workouts.size() < 5) {
+    multiplier = workouts.size();
+  }
+  for (int i = 0; i < goals.size(); i++) {
+    goalcounters.push_back(goals[i].count * multiplier);
+  }
+  int startpoint = 0;
+  for (startpoint = 0; startpoint < workouts.size(); startpoint++) {
+    workouttm = *localtime(&workouts[startpoint].date);
+    if (workouttm.tm_yday > currenttm.tm_yday - 5) {
+      break;
+    }
+  }
+  for (int i = startpoint;
+       i < workouts.size() && workouttm.tm_yday > currenttm.tm_yday - 5 &&
+       workouttm.tm_yday < currenttm.tm_yday;
+       i++) {
+
+    for (int j = 0; j < goals.size(); j++) {
+      if (workouts[i].activity == goals[j].activity &&
+          workouts[i].count >= goals[j].count) {
+        goalcounters[j] -= workouts[i].count;
+      }
+    }
+    if (i != workouts.size() - 1) {
+      workouttm = *localtime(&workouts[i + 1].date);
+    }
+  }
+  for (int i = 0; i < goals.size(); i++) {
+    goals[i].count = goalcounters[i];
+  }
+}

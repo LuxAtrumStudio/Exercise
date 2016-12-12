@@ -25,5 +25,6 @@ void AddGoal();
 void EditWorkOut(int pointer);
 bool CheckGoal(int pointer);
 bool SortCheck(WorkOut a, WorkOut b);
+void GoalBackUp();
 }
 #endif
