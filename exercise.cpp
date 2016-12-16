@@ -1,11 +1,11 @@
-#include "exercise.h"
-#include "induco.h"
+#include <math.h>
+#include <pessum.h>
 #include <algorithm>
 #include <ctime>
 #include <iostream>
-#include <math.h>
-#include <pessum.h>
 #include <vector>
+#include "exercise.h"
+#include "induco.h"
 
 namespace exercise {
 std::vector<WorkOut> goals;
@@ -210,6 +210,7 @@ bool exercise::CheckGoal(int pointer) {
       return (false);
     }
   }
+  return (false);
 }
 
 bool exercise::SortCheck(WorkOut a, WorkOut b) { return (a.date > b.date); }
@@ -218,15 +219,46 @@ void exercise::GoalBackUp() {
   time_t currenttime;
   time(&currenttime);
   struct tm currenttm = *localtime(&currenttime);
-  struct tm workouttm = *localtime(&workouts[0].date);
   std::vector<int> goalcounters;
-  int multiplier = 5;
-  if (workouts.size() < 5) {
-    multiplier = workouts.size();
+  for (int i = 0; i < goals.size(); i++) {
+    goalcounters.push_back(0);
+  }
+  int j = 1;
+  for (int k = 0; k < goals.size(); k++) {
+    j = 1;
+    int missedcount = 0, firstmissed = -1;
+    bool goalmet = false;
+    for (int i = workouts.size() - 1; i >= 0 && j <= 5; i--) {
+      struct tm workouttm = *localtime(&workouts[i].date);
+      if (currenttm.tm_yday - j != workouttm.tm_yday) {
+        j++;
+        if (goalmet == false) {
+          missedcount++;
+          if (firstmissed == -1) {
+            firstmissed = j - 1;
+          }
+        }
+        goalmet = false;
+      }
+      std::cout << workouts[i].activity << "=" << goals[k].activity << ","
+                << workouts[i].count << "=" << goals[k].count << "\n";
+      if (workouts[i].activity == goals[k].activity &&
+          workouts[i].count >= goals[k].count) {
+        goalmet = true;
+      }
+    }
+    std::cout << goals[k].activity << ":" << missedcount << "><" << firstmissed
+              << "\n";
+    if (firstmissed >= missedcount) {
+      goalcounters[k] = goals[k].count;
+    } else if (firstmissed < missedcount) {
+      goalcounters[k] = goals[k].count * missedcount;
+    }
   }
   for (int i = 0; i < goals.size(); i++) {
-    goalcounters.push_back(goals[i].count * multiplier);
+    goals[i].count = goalcounters[i];
   }
+  /*
   int startpoint = 0;
   for (startpoint = 0; startpoint < workouts.size(); startpoint++) {
     workouttm = *localtime(&workouts[startpoint].date);
@@ -238,11 +270,10 @@ void exercise::GoalBackUp() {
        i < workouts.size() && workouttm.tm_yday > currenttm.tm_yday - 5 &&
        workouttm.tm_yday < currenttm.tm_yday;
        i++) {
-
     for (int j = 0; j < goals.size(); j++) {
       if (workouts[i].activity == goals[j].activity &&
           workouts[i].count >= goals[j].count) {
-        goalcounters[j] -= workouts[i].count;
+        goalcounters[j] -= goals[j].count;
       }
     }
     if (i != workouts.size() - 1) {
@@ -251,5 +282,5 @@ void exercise::GoalBackUp() {
   }
   for (int i = 0; i < goals.size(); i++) {
     goals[i].count = goalcounters[i];
-  }
+  }*/
 }
