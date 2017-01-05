@@ -108,7 +108,7 @@ void exercise::DisplayExercise() {
 }
 
 void exercise::LoadExerciseData() {
-  goallux = pessum::luxreader::LoadLuxDataFile("goals");
+  goallux = pessum::luxreader::LoadLuxDataFile("/home/arden/bin/files/goals");
   for (int i = 0; i < goallux.datafilevariables[0].intvectorvalues.size();
        i++) {
     WorkOut newworkout;
@@ -117,7 +117,8 @@ void exercise::LoadExerciseData() {
     newworkout.count = goallux.datafilevariables[1].intvectorvalues[i];
     goals.push_back(newworkout);
   }
-  workoutlux = pessum::luxreader::LoadLuxDataFile("workouts");
+  workoutlux =
+      pessum::luxreader::LoadLuxDataFile("/home/arden/bin/files/workouts");
   for (int i = 0; i < workoutlux.datafilevariables[0].intvectorvalues.size();
        i++) {
     WorkOut newworkout;
@@ -130,8 +131,9 @@ void exercise::LoadExerciseData() {
 }
 
 void exercise::SaveExerciseData() {
-  pessum::luxreader::SaveLuxDataFile("goals", goallux);
-  pessum::luxreader::SaveLuxDataFile("workouts", workoutlux);
+  pessum::luxreader::SaveLuxDataFile("/home/arden/bin/files/goals", goallux);
+  pessum::luxreader::SaveLuxDataFile("/home/arden/bin/files/workouts",
+                                     workoutlux);
 }
 
 std::string exercise::GetActivity(Activity activity) {
@@ -230,7 +232,9 @@ void exercise::GoalBackUp() {
     bool goalmet = false;
     for (int i = workouts.size() - 1; i >= 0 && j <= 5; i--) {
       struct tm workouttm = *localtime(&workouts[i].date);
-      if (currenttm.tm_yday - j != workouttm.tm_yday) {
+      std::cout << currenttm.tm_yday << "-" << j << ">=" << workouttm.tm_yday
+                << "\n";
+      while (currenttm.tm_yday - j >= workouttm.tm_yday) {
         j++;
         if (goalmet == false) {
           missedcount++;
@@ -240,15 +244,11 @@ void exercise::GoalBackUp() {
         }
         goalmet = false;
       }
-      std::cout << workouts[i].activity << "=" << goals[k].activity << ","
-                << workouts[i].count << "=" << goals[k].count << "\n";
       if (workouts[i].activity == goals[k].activity &&
           workouts[i].count >= goals[k].count) {
         goalmet = true;
       }
     }
-    std::cout << goals[k].activity << ":" << missedcount << "><" << firstmissed
-              << "\n";
     if (firstmissed >= missedcount) {
       goalcounters[k] = goals[k].count;
     } else if (firstmissed < missedcount) {
