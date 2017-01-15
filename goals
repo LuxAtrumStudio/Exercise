@@ -1,3 +1,3 @@
 #DATAFILE
-vector int activity 1 3
-vector int count 50 30
+vector int activity 1 3 2 4
+vector int count 50 50 10 15

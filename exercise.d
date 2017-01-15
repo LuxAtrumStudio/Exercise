@@ -1,1 +1,1 @@
-exercise.o: exercise.cpp exercise.h induco.h
+exercise.o: exercise.cpp exercise.h

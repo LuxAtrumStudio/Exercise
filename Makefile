@@ -3,7 +3,7 @@ OBJ_FILES = $(notdir $(CPP_FILES:.cpp=.o))
 TOTAL_OBJ_FILES = $(wildcard */*.o) $(wildcard */*/*.o) $(wildcard */*/*/*.o)
 CC = g++
 COMPILER_FLAGS = -MMD -std=c++11 -w -c
-LINKER_FLAGS = -lpessum
+LINKER_FLAGS = -lappareo -lpessum -lncurses
 PROGRAM_NAME = exercise
 
 all: subsystem top_obj $(PROGRAM_NAME)
@@ -39,7 +39,7 @@ clean:
 
 .PHONY : tar
 tar: clean
-	tar -zcvf $(PROGRAM_NAME).tar.gz ../WorkOut
+	tar -zcvf $(PROGRAM_NAME).tar.gz ../Exercise
 
 .PHONY : log
 log:
@@ -50,3 +50,10 @@ help:
 	@echo make clean
 	@echo make tar
 	@echo make log
+
+.PHONY : install
+install: all
+	cp $(PROGRAM_NAME) ~/bin/
+
+.PHONY : new
+new: clean all

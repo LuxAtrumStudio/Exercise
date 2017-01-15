@@ -1,4 +1,10 @@
 SUCCESS>>Opened log: log_output.log>>pessum_files/logging.cpp/InitializeLogging
-INFORMATION>>Thu Dec 29 09:58:13 2016>>TimeStamp
-SUCCESS>>Terminated log file>>Pessum/logging.cpp/TerminateLogging
-INFORMATION>>Thu Dec 29 09:58:18 2016>>TimeStamp
+INFORMATION>>Wed Jan 11 15:43:06 2017>>TimeStamp
+SUCCESS>>Initialized Ncurses>>appareo_files/curse/curse_core.cpp/InitializeNcurses
+SUCCESS>>Initialized output>>appareo_files/curse/output.cpp/InitializeOutput
+SUCCESS>>Initialized colors>>appareo_files/curse/output.cpp/InitializeColor
+SUCCESS>>Creaded window "Count Down To The Begining Of The End">>appareo_files/curse/window.cpp/[Count Down To The Begining Of The End]CreateWindow
+SUCCESS>>Terminated window "Count Down To The Begining Of The End">>appareo_files/curse/window.cpp/[Count Down To The Begining Of The End]TerminateWindow
+SUCCESS>>Terminated Ncurses>>appareo_files/curse/curse_core.cpp/TerminateNCurses
+SUCCESS>>Terminated log file>>pessum_files/logging.cpp/TerminateLogging
+INFORMATION>>Wed Jan 11 15:43:08 2017>>TimeStamp

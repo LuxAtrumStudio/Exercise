@@ -3,9 +3,10 @@
 #include <ctime>
 #include <iostream>
 #include <math.h>
+#include <appareo.h>
 #include <pessum.h>
 int main() {
-  pessum::InitializePessumComponents();
+  appareo::InitializeAppareo();
   exercise::MainLoop();
-  pessum::TerminatePessumComponents();
+  appareo::TerminateAppareo();
 }
