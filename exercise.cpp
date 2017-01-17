@@ -1,253 +1,220 @@
-#include "exercise.h"
+#include "exercise.hpp"
 #include <algorithm>
 #include <appareo.h>
-#include <ctime>
-#include <iostream>
-#include <math.h>
 #include <pessum.h>
+#include <string>
 #include <vector>
+
+namespace exercise {
+std::vector<EType> types;
+std::vector<Workout> workouts;
+std::vector<Exercise> goals;
+std::string filelocation = "/home/ardenrasmussen/bin/files/";
+}
 
 using namespace appareo::curse::out;
 
-namespace exercise {
-std::vector<Exercise> goals;
-std::vector<Workout> workouts;
-pessum::luxreader::DataFile goallux;
-pessum::luxreader::DataFile workoutlux;
-}
-
 void exercise::MainLoop() {
-  bool running = true;
-  LoadExerciseData();
-  // GoalBackUp();
+  LoadTypes();
+  LoadWorkouts();
   appareo::curse::InitializeWindow();
-  appareo::curse::windows[0].CreateWindow(
-      "Goals", -1, ceil(goals.size() / 3) + 3, 0, 0, true, true);
   appareo::curse::InitializeWindow();
+  appareo::curse::windows[0].CreateWindow("Exercise", -1, 5, 0, 0, true, true);
   appareo::curse::windows[1].CreateWindow(
-      "Workouts", -1, appareo::curse::scrheight - ceil(goals.size() / 3) - 6, 0,
-      ceil(goals.size() / 3) + 3, true, true);
-  std::string input = "";
+      "Record", -1, appareo::curse::scrheight - 8, 0, 5, true, true);
+  bool running = true;
+  int displaytype = 1;
   while (running == true) {
-    DisplayExercise();
+    if (displaytype == 1) {
+      DisplayRecord();
+    }
     appareo::curse::Field newfield;
     newfield.name = "In";
     newfield.type = 4;
     std::vector<appareo::curse::Field> formfields = {newfield};
     formfields = appareo::curse::NewForm(formfields, "Input", -1, 3, 0,
                                          appareo::curse::scrheight - 3);
-    input = formfields[0].sval;
+    std::string input = formfields[0].sval;
     if (input == "q") {
       running = false;
     }
-    if (input == "r") {
-      AddWorkOut();
-    }
     if (input == "a") {
-      AddGoal();
+      AddWorkout();
     }
-    if (input[0] == 'e') {
+    if (input[0] == 'v') {
+      input.erase(input.begin(), input.begin() + 2);
+      if (CheckStr(input) == true) {
+        DisplayWorkout(stoi(input) - 1);
+      }
     }
   }
-  SaveExerciseData();
+  SaveWorkouts();
 }
 
-void exercise::DisplayExercise() {
-  std::sort(workouts.begin(), workouts.end(), SortCheck);
+void exercise::DisplayRecord() {
   int width, height, groupsize;
-  width = appareo::curse::windows[0].width - 2;
-  height = appareo::curse::windows[0].height - 2;
-  groupsize = width / 6;
+  width = appareo::curse::windows[1].width - 2;
+  height = appareo::curse::windows[1].height - 2;
+  BindWindow("Record");
+  groupsize = width / 10;
   std::string labelline;
-  BindWindow("Goals");
-  if (goals.size() == 0) {
-    SetAtt({GREEN_TEXT});
-    PrintZ("NO EXERCISE TODAY", 5);
-    SetAtt();
+  labelline = "INDEX";
+  while (labelline.size() >= groupsize * 2) {
+    labelline.pop_back();
   }
-  int perrow = 3, row = 1;
-  for (int i = 0; i < goals.size(); i) {
-    for (int j = 0; j < perrow; j++) {
-      std::vector<Attributes> atts;
-      CheckGoal(i);
-      std::string line = "";
-      line = line + GetActivity(goals[i].activity) + " " +
-             std::to_string(goals[i].count);
-      if (goals[i].compleated == true) {
-        atts.push_back(STANDOUT);
-      }
-      // induco::SetColor(goals[i].activity);
-      if (goals[i].activity == 0) {
-        atts.push_back(RED_TEXT);
-      }
-      if (goals[i].activity == 1) {
-        atts.push_back(GREEN_TEXT);
-      }
-      if (goals[i].activity == 2) {
-        atts.push_back(YELLOW_TEXT);
-      }
-      if (goals[i].activity == 3) {
-        atts.push_back(BLUE_TEXT);
-      }
-      if (goals[i].activity == 4) {
-        atts.push_back(MAGENTA_TEXT);
-      }
-      if (goals[i].activity == 5) {
-        atts.push_back(CYAN_TEXT);
-      }
-      SetAtt(atts);
-      Print(line, row,
-            (j * width / perrow) + ((width / perrow) - line.size()) / 2);
-      SetAtt();
-      i++;
-      if (i >= goals.size()) {
-        break;
-      }
-    }
-    row++;
-  }
-  BindWindow("Workouts");
-  width = appareo::curse::windows[1].width;
-  height = appareo::curse::windows[1].height;
-  labelline = "DATE";
-  while (labelline.size() < groupsize) {
+  while (labelline.size() < groupsize * 2) {
     labelline += " ";
   }
-  labelline += "ACTIVITIES";
+  labelline += "DATE";
+  while (labelline.size() >= groupsize * 5) {
+    labelline.pop_back();
+  }
+  while (labelline.size() < groupsize * 5) {
+    labelline += " ";
+  }
+  labelline += "GROUPS";
+  while (labelline.size() >= groupsize * 10) {
+    labelline.pop_back();
+  }
+  while (labelline.size() < groupsize * 10) {
+    labelline += " ";
+  }
   Print(labelline, 1, 1);
   if (workouts.size() == 0) {
-    SetAtt({RED_TEXT});
-    PrintZ("NO EXERCISES RECORDED", 5);
+    SetAtt({RED_TEXT, UNDERLINE});
+    PrintZ("NO WORKOUTS RECORDED", 5);
     SetAtt();
   }
-  for (int i = 0; i < workouts.size() && i < height - 4; i++) {
-    Print(appareo::induco::DisplayDate(workouts[i].date, false, false), i + 2,
-          1);
-    int pos = groupsize;
-    for (int j = 0; j < workouts[i].activities.size(); j++) {
-      std::string line = std::to_string(workouts[i].counts[j]) + "x" +
-                         GetActivity(workouts[i].activities[j]);
-
-      if (workouts[i].activities[j] == 0) {
-        SetAtt({RED_TEXT});
-      }
-      if (workouts[i].activities[j] == 1) {
-        SetAtt({GREEN_TEXT});
-      }
-      if (workouts[i].activities[j] == 2) {
-        SetAtt({YELLOW_TEXT});
-      }
-      if (workouts[i].activities[j] == 3) {
-        SetAtt({BLUE_TEXT});
-      }
-      if (workouts[i].activities[j] == 4) {
-        SetAtt({MAGENTA_TEXT});
-      }
-      if (workouts[i].activities[j] == 5) {
-        SetAtt({CYAN_TEXT});
-      }
-      Print(line, i + 2, pos + 1);
-      pos += ((groupsize * 5) / workouts[i].activities.size());
-      SetAtt();
+  for (int i = 0; i < workouts.size() && i < height - 6; i++) {
+    std::string line = "";
+    line += std::to_string(i + 1) + ". ";
+    while (line.size() >= groupsize * 2) {
+      line.pop_back();
     }
+    while (line.size() < groupsize * 2) {
+      line += " ";
+    }
+    line += appareo::induco::DisplayDate(workouts[i].date, false, true);
+    while (line.size() >= groupsize * 5) {
+      line.pop_back();
+    }
+    while (line.size() < groupsize * 5) {
+      line += " ";
+    }
+    Print(line, i + 3, 1);
+    for (int j = 0; j < workouts[i].exercises.size(); j++) {
+      if (types[workouts[i].exercises[j].etypepointer].groupindex == 0) {
+        SetAtt({BLUE_BACK});
+      }
+      if (types[workouts[i].exercises[j].etypepointer].groupindex == 1) {
+        SetAtt({GREEN_BACK});
+      }
+      if (types[workouts[i].exercises[j].etypepointer].groupindex == 2) {
+        SetAtt({CYAN_BACK});
+      }
+      if (types[workouts[i].exercises[j].etypepointer].groupindex == 3) {
+        SetAtt({MAGENTA_BACK});
+      }
+      Print(" ", i + 3,
+            (groupsize * 5) +
+                types[workouts[i].exercises[j].etypepointer].groupindex);
+    }
+    SetAtt();
   }
-  PrintZ("Record[r] | Add Goal[a] | Edit[e] | Quit[q]", 7);
+  PrintZ("Record[r] | Edit[e] | ToggleDisplay[d] | ToggleUnits[u] | Quit[q]",
+         7);
 }
 
-void exercise::LoadExerciseData() {
-  goallux = pessum::luxreader::LoadLuxDataFile(
-      "/home/ardenrasmussen/bin/files/goals");
-  for (int i = 0; i < goallux.datafilevariables[0].intvectorvalues.size();
-       i++) {
-    Exercise newworkout;
-    newworkout.activity =
-        IntActivity(goallux.datafilevariables[0].intvectorvalues[i]);
-    newworkout.count = goallux.datafilevariables[1].intvectorvalues[i];
-    newworkout.compleated = false;
-    goals.push_back(newworkout);
+void exercise::DisplayGraph() {}
+
+void exercise::DisplayWorkout(int pointer) {
+  int window = appareo::curse::windows.size();
+  Workout workout = workouts[pointer];
+  appareo::curse::InitializeWindow();
+  appareo::curse::windows[window].CreateWindow(
+      appareo::induco::DisplayDate(workout.date, false, true),
+      appareo::curse::scrwidth / 2, appareo::curse::scrheight / 2, -1, -1, true,
+      true);
+  for (int i = 0; i < workout.exercises.size(); i++) {
+    if (types[workout.exercises[i].etypepointer].groupindex == 0) {
+      SetAtt({BLUE_TEXT}, window);
+    }
+    if (types[workout.exercises[i].etypepointer].groupindex == 1) {
+      SetAtt({GREEN_TEXT}, window);
+    }
+    if (types[workout.exercises[i].etypepointer].groupindex == 2) {
+      SetAtt({CYAN_TEXT}, window);
+    }
+    if (types[workout.exercises[i].etypepointer].groupindex == 3) {
+      SetAtt({MAGENTA_TEXT}, window);
+    }
+    Print(std::to_string(workout.exercises[i].sets) + "x" +
+              std::to_string(workout.exercises[i].reps) + " " +
+              types[workout.exercises[i].etypepointer].activitytype,
+          i + 1, 1, window);
   }
-  workoutlux = pessum::luxreader::LoadLuxDataFile(
-      "/home/ardenrasmussen/bin/files/workouts");
-  int activitycounter = 0;
-  for (int i = 0; i < workoutlux.datafilevariables[0].intvectorvalues.size();
-       i++) {
+  getch();
+  appareo::curse::windows[window].TerminateWindow();
+  appareo::curse::windows.erase(appareo::curse::windows.begin() + window);
+}
+
+void exercise::LoadTypes() {
+  std::vector<std::string> luxtypes =
+      pessum::luxreader::LoadLuxListFile(filelocation + "types");
+  std::string group = "";
+  std::string exercise = "";
+  int groupindex = -1;
+  int exerciseindex = -1;
+  for (int i = 0; i < luxtypes.size(); i++) {
+    if (luxtypes[i][0] == '>') {
+      luxtypes[i].erase(luxtypes[i].begin());
+      group = luxtypes[i];
+      groupindex++;
+    } else {
+      exercise = luxtypes[i];
+      exerciseindex++;
+      EType newtype;
+      newtype.activitytype = exercise;
+      newtype.activityindex = exerciseindex;
+      newtype.grouptype = group;
+      newtype.groupindex = groupindex;
+      types.push_back(newtype);
+    }
+  }
+  std::sort(types.begin(), types.end(), SortCheck);
+}
+
+void exercise::LoadWorkouts() {
+  pessum::luxreader::DataFile lux =
+      pessum::luxreader::LoadLuxDataFile(filelocation + "workouts");
+  int exerciseindex = 0;
+  for (int i = 0; i < lux.datafilevariables[0].intvectorvalues.size(); i++) {
     Workout newworkout;
-    newworkout.date = workoutlux.datafilevariables[0].intvectorvalues[i];
-    for (int j = activitycounter;
-         j <
-         activitycounter + workoutlux.datafilevariables[1].intvectorvalues[i];
+    newworkout.date = lux.datafilevariables[0].intvectorvalues[i];
+    for (int j = exerciseindex;
+         j < exerciseindex + (lux.datafilevariables[1].intvectorvalues[i] * 3);
          j++) {
-      newworkout.activities.push_back(
-          IntActivity(workoutlux.datafilevariables[2].intvectorvalues[j]));
-      newworkout.counts.push_back(
-          workoutlux.datafilevariables[3].intvectorvalues[j]);
+      Exercise newexercise;
+      newexercise.etypepointer = lux.datafilevariables[2].intvectorvalues[j];
+      j++;
+      newexercise.reps = lux.datafilevariables[2].intvectorvalues[j];
+      j++;
+      newexercise.sets = lux.datafilevariables[2].intvectorvalues[j];
+      newworkout.exercises.push_back(newexercise);
     }
-    activitycounter += workoutlux.datafilevariables[1].intvectorvalues[i];
     workouts.push_back(newworkout);
+    exerciseindex += (lux.datafilevariables[1].intvectorvalues[i] * 3);
   }
 }
 
-void exercise::SaveExerciseData() {
-  pessum::luxreader::SaveLuxDataFile("/home/ardenrasmussen/bin/files/goals",
-                                     goallux);
-  pessum::luxreader::SaveLuxDataFile("/home/ardenrasmussen/bin/files/workouts",
-                                     workoutlux);
-}
+void exercise::LoadGoals() {}
 
-std::string exercise::GetActivity(Activity activity) {
-  if (activity == SITUP) {
-    return ("SITUP");
-  } else if (activity == PUSHUP) {
-    return ("PUSHUP");
-  } else if (activity == CALFRAISE) {
-    return ("CALF RAISE");
-  } else if (activity == SQUAT) {
-    return ("SQUAT");
-  } else if (activity == PLANK) {
-    return ("PLANK");
-  } else {
-    return ("NULL");
-  }
-}
-
-int exercise::StrActivityInt(std::string input) {
-  if (input == "situp") {
-    return (1);
-  } else if (input == "pushup") {
-    return (2);
-  } else if (input == "calf raise") {
-    return (3);
-  } else if (input == "squat") {
-    return (4);
-  } else if (input == "plank") {
-    return (5);
-  } else {
-    return (0);
-  }
-}
-
-exercise::Activity exercise::IntActivity(int index) {
-  if (index == 1) {
-    return (SITUP);
-  } else if (index == 2) {
-    return (PUSHUP);
-  } else if (index == 3) {
-    return (CALFRAISE);
-  } else if (index == 4) {
-    return (SQUAT);
-  } else if (index == 5) {
-    return (PLANK);
-  } else {
-    return (NONE);
-  }
-}
-
-void exercise::AddWorkOut() {
+void exercise::AddWorkout() {
   std::vector<appareo::curse::Field> formfields;
   appareo::curse::Field newfield;
-  newfield.name = "Activity Count";
+  newfield.name = "Exercise Count";
   newfield.type = 1;
-  newfield.sval = "4";
+  newfield.sval = "5";
   formfields.push_back(newfield);
   formfields = appareo::curse::NewForm(formfields, "New Workout",
                                        appareo::curse::scrwidth / 2, 3);
@@ -255,88 +222,84 @@ void exercise::AddWorkOut() {
   int activitycount;
 
   activitycount = formfields[0].ival;
-  formfields.clear();
-  for (int i = 0; i < activitycount; i++) {
-    appareo::curse::Field field;
-    field.name = "Activity " + std::to_string(i);
-    field.type = 4;
-    formfields.push_back(field);
-    field.name = "Count " + std::to_string(i);
-    field.type = 1;
-    formfields.push_back(field);
+  std::vector<std::string> options;
+  for (int i = 0; i < types.size(); i++) {
+    options.push_back(types[i].activitytype);
   }
-  formfields = appareo::curse::NewForm(formfields, "New Workout",
-                                       appareo::curse::scrwidth / 2,
-                                       appareo::curse::scrheight / 2);
   Workout newworkout;
   time(&currenttime);
   newworkout.date = currenttime;
-  for (int i = 0; i < activitycount * 2; i += 2) {
-    newworkout.activities.push_back(
-        IntActivity(StrActivityInt(formfields[i].sval)));
-    newworkout.counts.push_back(formfields[i + 1].ival);
+  for (int i = 0; i < activitycount; i++) {
+    formfields.clear();
+    appareo::curse::Field field;
+    field.name = "Exercise Type";
+    field.type = 6;
+    field.options = options;
+    formfields.push_back(field);
+    field.name = "Reps/Seconds";
+    field.type = 1;
+    field.sval = "1";
+    formfields.push_back(field);
+    field.name = "Sets";
+    field.type = 1;
+    field.sval = "1";
+    formfields.push_back(field);
+    formfields = appareo::curse::NewForm(
+        formfields, "Exercise " + std::to_string(i + 1),
+        appareo::curse::scrwidth / 2, appareo::curse::scrheight / 2);
+    Exercise newexercise;
+    newexercise.etypepointer = formfields[0].ival;
+    newexercise.reps = formfields[1].ival;
+    newexercise.sets = formfields[2].ival;
+    newworkout.exercises.push_back(newexercise);
   }
   workouts.push_back(newworkout);
-  workoutlux.datafilevariables[0].intvectorvalues.push_back(newworkout.date);
-  workoutlux.datafilevariables[1].intvectorvalues.push_back(
-      newworkout.activities.size());
-  for (int i = 0; i < activitycount; i++) {
-    workoutlux.datafilevariables[2].intvectorvalues.push_back(
-        newworkout.activities[i]);
-    workoutlux.datafilevariables[3].intvectorvalues.push_back(
-        newworkout.counts[i]);
+}
+
+void exercise::SaveWorkouts() {
+  pessum::luxreader::DataFile lux;
+  lux.datafilename = "workouts";
+  pessum::luxreader::Variable newvar;
+  for (int i = 0; i < 3; i++) {
+    lux.datafilevariables.push_back(newvar);
   }
-}
-
-void exercise::AddGoal() {
-  std::vector<appareo::curse::Field> formfields;
-  appareo::curse::Field newfield;
-  newfield.name = "Activity";
-  newfield.type = 4;
-  formfields.push_back(newfield);
-  newfield.name = "Count";
-  newfield.type = 1;
-  formfields.push_back(newfield);
-  formfields = appareo::curse::NewForm(formfields, "New Goal",
-                                       appareo::curse::scrwidth / 2, 4);
-  int activity;
-  int count;
-  activity = StrActivityInt(formfields[0].sval);
-  count = formfields[1].ival;
-  Exercise newworkout;
-  newworkout.activity = IntActivity(activity);
-  newworkout.count = count;
-  goals.push_back(newworkout);
-  goallux.datafilevariables[0].intvectorvalues.push_back(newworkout.activity);
-  goallux.datafilevariables[1].intvectorvalues.push_back(newworkout.count);
-}
-
-void exercise::EditWorkOut(int pointer) {}
-
-bool exercise::CheckGoal(int pointer) {
-  time_t currenttime;
-  struct tm current;
-  struct tm workout;
-  time(&currenttime);
-  current = *localtime(&currenttime);
+  lux.datafilevariables[0].variablename = "date";
+  lux.datafilevariables[0].variabletype = "vector";
+  lux.datafilevariables[0].variabledefinitiontype = "int";
+  lux.datafilevariables[1].variablename = "count";
+  lux.datafilevariables[1].variabletype = "vector";
+  lux.datafilevariables[1].variabledefinitiontype = "int";
+  lux.datafilevariables[2].variablename = "data";
+  lux.datafilevariables[2].variabletype = "vector";
+  lux.datafilevariables[2].variabledefinitiontype = "int";
   for (int i = 0; i < workouts.size(); i++) {
-    workout = *localtime(&workouts[i].date);
-    if (workout.tm_yday == current.tm_yday) {
-      for (int j = 0; j < workouts[i].activities.size(); j++) {
-        if (workouts[i].activities[j] == goals[pointer].activity &&
-            workouts[i].counts[j] == goals[pointer].count) {
-          goals[pointer].compleated = true;
-          return (true);
-        }
-      }
+    lux.datafilevariables[0].intvectorvalues.push_back(workouts[i].date);
+    lux.datafilevariables[1].intvectorvalues.push_back(
+        workouts[i].exercises.size());
+    for (int j = 0; j < workouts[i].exercises.size(); j++) {
+      lux.datafilevariables[2].intvectorvalues.push_back(
+          workouts[i].exercises[j].etypepointer);
+      lux.datafilevariables[2].intvectorvalues.push_back(
+          workouts[i].exercises[j].reps);
+      lux.datafilevariables[2].intvectorvalues.push_back(
+          workouts[i].exercises[j].sets);
     }
-    if (workout.tm_yday < current.tm_yday) {
-      return (false);
-    }
+  }
+  pessum::luxreader::SaveLuxDataFile(filelocation + "workouts", lux);
+}
+
+bool exercise::SortCheck(const EType a, const EType b) {
+  if (a.activitytype < b.activitytype) {
+    return (true);
   }
   return (false);
 }
 
-bool exercise::SortCheck(Workout a, Workout b) { return (a.date > b.date); }
-
-void exercise::GoalBackUp() {}
+bool exercise::CheckStr(std::string str) {
+  for (int i = 0; i < str.size(); i++) {
+    if (int(str[i]) < 48 || int(str[i]) > 57) {
+      return (false);
+    }
+  }
+  return (true);
+}

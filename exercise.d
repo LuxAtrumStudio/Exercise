@@ -1,1 +1,1 @@
-exercise.o: exercise.cpp exercise.h
+exercise.o: exercise.cpp exercise.hpp

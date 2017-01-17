@@ -1,14 +1,28 @@
 SUCCESS>>Opened log: log_output.log>>pessum_files/logging.cpp/InitializeLogging
-INFORMATION>>Mon Jan 16 23:36:24 2017>>TimeStamp
+INFORMATION>>Tue Jan 17 10:28:14 2017>>TimeStamp
 SUCCESS>>Initialized Ncurses>>appareo_files/curse/curse_core.cpp/InitializeNcurses
 SUCCESS>>Initialized output>>appareo_files/curse/output.cpp/InitializeOutput
 SUCCESS>>Initialized colors>>appareo_files/curse/output.cpp/InitializeColor
-SUCCESS>>Creaded window "Goals">>appareo_files/curse/window.cpp/[Goals]CreateWindow
-SUCCESS>>Creaded window "Workouts">>appareo_files/curse/window.cpp/[Workouts]CreateWindow
+SUCCESS>>Creaded window "Exercise">>appareo_files/curse/window.cpp/[Exercise]CreateWindow
+SUCCESS>>Creaded window "Record">>appareo_files/curse/window.cpp/[Record]CreateWindow
 SUCCESS>>Creaded window "Input">>appareo_files/curse/window.cpp/[Input]CreateWindow
 SUCCESS>>Terminated window "Input">>appareo_files/curse/window.cpp/[Input]TerminateWindow
-SUCCESS>>Terminated window "Goals">>appareo_files/curse/window.cpp/[Goals]TerminateWindow
-SUCCESS>>Terminated window "Workouts">>appareo_files/curse/window.cpp/[Workouts]TerminateWindow
+SUCCESS>>Creaded window "Mon Jan 16 2017">>appareo_files/curse/window.cpp/[Mon Jan 16 2017]CreateWindow
+SUCCESS>>Terminated window "Mon Jan 16 2017">>appareo_files/curse/window.cpp/[Mon Jan 16 2017]TerminateWindow
+SUCCESS>>Creaded window "Input">>appareo_files/curse/window.cpp/[Input]CreateWindow
+SUCCESS>>Terminated window "Input">>appareo_files/curse/window.cpp/[Input]TerminateWindow
+SUCCESS>>Creaded window "Input">>appareo_files/curse/window.cpp/[Input]CreateWindow
+SUCCESS>>Terminated window "Input">>appareo_files/curse/window.cpp/[Input]TerminateWindow
+SUCCESS>>Creaded window "Mon Jan 16 2017">>appareo_files/curse/window.cpp/[Mon Jan 16 2017]CreateWindow
+SUCCESS>>Terminated window "Mon Jan 16 2017">>appareo_files/curse/window.cpp/[Mon Jan 16 2017]TerminateWindow
+SUCCESS>>Creaded window "Input">>appareo_files/curse/window.cpp/[Input]CreateWindow
+SUCCESS>>Terminated window "Input">>appareo_files/curse/window.cpp/[Input]TerminateWindow
+SUCCESS>>Creaded window "Input">>appareo_files/curse/window.cpp/[Input]CreateWindow
+SUCCESS>>Terminated window "Input">>appareo_files/curse/window.cpp/[Input]TerminateWindow
+SUCCESS>>Creaded window "Input">>appareo_files/curse/window.cpp/[Input]CreateWindow
+SUCCESS>>Terminated window "Input">>appareo_files/curse/window.cpp/[Input]TerminateWindow
+SUCCESS>>Terminated window "Exercise">>appareo_files/curse/window.cpp/[Exercise]TerminateWindow
+SUCCESS>>Terminated window "Record">>appareo_files/curse/window.cpp/[Record]TerminateWindow
 SUCCESS>>Terminated Ncurses>>appareo_files/curse/curse_core.cpp/TerminateNCurses
 SUCCESS>>Terminated log file>>pessum_files/logging.cpp/TerminateLogging
-INFORMATION>>Mon Jan 16 23:36:31 2017>>TimeStamp
+INFORMATION>>Tue Jan 17 10:28:27 2017>>TimeStamp
