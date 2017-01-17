@@ -1,11 +1,11 @@
-#include <appareo.h>
-#include <math.h>
-#include <pessum.h>
+#include "exercise.h"
 #include <algorithm>
+#include <appareo.h>
 #include <ctime>
 #include <iostream>
+#include <math.h>
+#include <pessum.h>
 #include <vector>
-#include "exercise.h"
 
 using namespace appareo::curse::out;
 
@@ -155,7 +155,8 @@ void exercise::DisplayExercise() {
 }
 
 void exercise::LoadExerciseData() {
-  goallux = pessum::luxreader::LoadLuxDataFile("/home/arden/bin/files/goals");
+  goallux = pessum::luxreader::LoadLuxDataFile(
+      "/home/ardenrasmussen/bin/files/goals");
   for (int i = 0; i < goallux.datafilevariables[0].intvectorvalues.size();
        i++) {
     Exercise newworkout;
@@ -165,8 +166,8 @@ void exercise::LoadExerciseData() {
     newworkout.compleated = false;
     goals.push_back(newworkout);
   }
-  workoutlux =
-      pessum::luxreader::LoadLuxDataFile("/home/arden/bin/files/workouts");
+  workoutlux = pessum::luxreader::LoadLuxDataFile(
+      "/home/ardenrasmussen/bin/files/workouts");
   int activitycounter = 0;
   for (int i = 0; i < workoutlux.datafilevariables[0].intvectorvalues.size();
        i++) {
@@ -187,8 +188,9 @@ void exercise::LoadExerciseData() {
 }
 
 void exercise::SaveExerciseData() {
-  pessum::luxreader::SaveLuxDataFile("/home/arden/bin/files/goals", goallux);
-  pessum::luxreader::SaveLuxDataFile("/home/arden/bin/files/workouts",
+  pessum::luxreader::SaveLuxDataFile("/home/ardenrasmussen/bin/files/goals",
+                                     goallux);
+  pessum::luxreader::SaveLuxDataFile("/home/ardenrasmussen/bin/files/workouts",
                                      workoutlux);
 }
 
@@ -201,6 +203,8 @@ std::string exercise::GetActivity(Activity activity) {
     return ("CALF RAISE");
   } else if (activity == SQUAT) {
     return ("SQUAT");
+  } else if (activity == PLANK) {
+    return ("PLANK");
   } else {
     return ("NULL");
   }
@@ -215,6 +219,8 @@ int exercise::StrActivityInt(std::string input) {
     return (3);
   } else if (input == "squat") {
     return (4);
+  } else if (input == "plank") {
+    return (5);
   } else {
     return (0);
   }
@@ -229,6 +235,8 @@ exercise::Activity exercise::IntActivity(int index) {
     return (CALFRAISE);
   } else if (index == 4) {
     return (SQUAT);
+  } else if (index == 5) {
+    return (PLANK);
   } else {
     return (NONE);
   }
@@ -243,9 +251,8 @@ void exercise::AddWorkOut() {
   formfields.push_back(newfield);
   formfields = appareo::curse::NewForm(formfields, "New Workout",
                                        appareo::curse::scrwidth / 2, 3);
-  int activity;
   time_t currenttime;
-  int count, activitycount;
+  int activitycount;
 
   activitycount = formfields[0].ival;
   formfields.clear();

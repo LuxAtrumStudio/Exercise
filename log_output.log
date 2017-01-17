@@ -1,10 +1,14 @@
 SUCCESS>>Opened log: log_output.log>>pessum_files/logging.cpp/InitializeLogging
-INFORMATION>>Wed Jan 11 15:43:06 2017>>TimeStamp
+INFORMATION>>Mon Jan 16 23:36:24 2017>>TimeStamp
 SUCCESS>>Initialized Ncurses>>appareo_files/curse/curse_core.cpp/InitializeNcurses
 SUCCESS>>Initialized output>>appareo_files/curse/output.cpp/InitializeOutput
 SUCCESS>>Initialized colors>>appareo_files/curse/output.cpp/InitializeColor
-SUCCESS>>Creaded window "Count Down To The Begining Of The End">>appareo_files/curse/window.cpp/[Count Down To The Begining Of The End]CreateWindow
-SUCCESS>>Terminated window "Count Down To The Begining Of The End">>appareo_files/curse/window.cpp/[Count Down To The Begining Of The End]TerminateWindow
+SUCCESS>>Creaded window "Goals">>appareo_files/curse/window.cpp/[Goals]CreateWindow
+SUCCESS>>Creaded window "Workouts">>appareo_files/curse/window.cpp/[Workouts]CreateWindow
+SUCCESS>>Creaded window "Input">>appareo_files/curse/window.cpp/[Input]CreateWindow
+SUCCESS>>Terminated window "Input">>appareo_files/curse/window.cpp/[Input]TerminateWindow
+SUCCESS>>Terminated window "Goals">>appareo_files/curse/window.cpp/[Goals]TerminateWindow
+SUCCESS>>Terminated window "Workouts">>appareo_files/curse/window.cpp/[Workouts]TerminateWindow
 SUCCESS>>Terminated Ncurses>>appareo_files/curse/curse_core.cpp/TerminateNCurses
 SUCCESS>>Terminated log file>>pessum_files/logging.cpp/TerminateLogging
-INFORMATION>>Wed Jan 11 15:43:08 2017>>TimeStamp
+INFORMATION>>Mon Jan 16 23:36:31 2017>>TimeStamp
